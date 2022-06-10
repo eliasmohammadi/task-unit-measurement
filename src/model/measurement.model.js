@@ -1,3 +1,5 @@
+const {InvalidFormulaFormatException} = require('../exception')
+
 class Dimension {
     constructor(name) {
         this.name = name
@@ -17,7 +19,7 @@ class AbstractMeasurementUnit {
         return new Error('not implemented')
     }
 
-    convertFromBase(options={}) {
+    convertFromBase(options = {}) {
         return new Error('not implemented')
     }
 
@@ -53,10 +55,10 @@ class CoefficientUnit extends AbstractMeasurementUnit {
         return bu
     }
 
-    convertFromBase(options={}) {
+    convertFromBase(options = {}) {
         this.value = (this.basicUnit.value / this.factor)
-        if(options && options.fixedDigit)
-            this.value  = parseFloat(this.value.toFixed(options.fixedDigit))
+        if (options && options.fixedDigit)
+            this.value = parseFloat(this.value.toFixed(options.fixedDigit))
     }
 }
 
@@ -67,10 +69,16 @@ class FormulatedUnit extends AbstractMeasurementUnit {
     }
 
     setFormulaToBase(formula) {
+        if (!this.isValidFormula(formula)) {
+            return InvalidFormulaFormatException
+        }
         this.formulatedToBase = formula
     }
 
     setFormulaFromBase(formula) {
+        if (!this.isValidFormula(formula)) {
+            return InvalidFormulaFormatException
+        }
         this.formulatedFromBase = formula
     }
 
@@ -79,18 +87,33 @@ class FormulatedUnit extends AbstractMeasurementUnit {
         this.value = value
     }
 
+    isValidFormula(formula) {
+        try {
+            const f = this._replaceValue(formula, 1)
+            eval(f);
+            return true
+        } catch (e) {
+            return false
+        }
+    }
+
     convertToBase(value) {
-        const formula = this.formulatedToBase.replace(/a/gi, value)
+        const formula = this._replaceValue(this.formulatedToBase, value)
         const bu = this.basicUnit
         bu.setValue(eval(formula))
         return bu
     }
 
     convertFromBase(options) {
-        const f = this.formulatedFromBase.replace(/a/gi, this.basicUnit.value)
+        const f = this._replaceValue(this.formulatedFromBase, this.basicUnit.value)
         this.value = (eval(f))
-        if(options && options.fixedDigit)
+        if (options && options.fixedDigit)
             this.value = parseFloat(this.value.toFixed(options.fixedDigit))
+    }
+
+
+    _replaceValue(formula, value) {
+        return formula.replace(/a/gi, value)
     }
 
 

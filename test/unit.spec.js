@@ -26,6 +26,27 @@ describe('MeasurementUnit', () => {
         done()
     })
 
+    it('should check formula validation ', (done) => {
+
+        const dimension = new Dimension('temperature')
+        const basicUnit = new BasicUnit('Celsius', 'c', dimension)
+        const fu = new FormulatedUnit('kelvin', 'K', basicUnit)
+        expect(fu.isValidFormula('(a-2')).to.be.false
+        expect(fu.isValidFormula('(a*b-2)')).to.be.false
+        expect(fu.isValidFormula('(a*2)')).to.be.true
+        done()
+    })
+
+    it('should return InvalidFormulaFormatException ', (done) => {
+
+        const dimension = new Dimension('temperature')
+        const basicUnit = new BasicUnit('Celsius', 'c', dimension)
+        const fu = new FormulatedUnit('kelvin', 'K', basicUnit)
+        expect(fu.setFormulaFromBase('(a-2').type).to.be.equal('InvalidFormulaFormatException')
+        expect(fu.setFormulaFromBase('(a-2').type).to.be.equal('InvalidFormulaFormatException')
+        done()
+    })
+
     it('should convert FormulatedUnit to BasicUnit', (done) => {
         const dimension = new Dimension('temperature')
         const basicUnit = new BasicUnit('celsius', 'c', dimension)
@@ -49,4 +70,5 @@ describe('MeasurementUnit', () => {
         expect(formulatedUnit.value).to.be.equal(33.8)
         done()
     })
+
 })

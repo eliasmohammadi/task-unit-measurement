@@ -1,6 +1,13 @@
+const {NotSameBasicUnitException} = require('./exception')
 class UnitConverter {
 
+    isValidToConvert(fUnit, sUnit) {
+        return fUnit.basicUnit.dimension.name === sUnit.basicUnit.dimension.name
+    }
+
     convert(firstUnit, secondUnit, options = {}) {
+        if(!this.isValidToConvert(firstUnit,secondUnit))
+            return NotSameBasicUnitException
         secondUnit.basicUnit = firstUnit.convertToBase(firstUnit.value)
         let fixedDigit = 1
         if (options && options.fixedDigit)
@@ -9,6 +16,8 @@ class UnitConverter {
         return secondUnit
     }
 
+
 }
+
 
 module.exports = new UnitConverter()

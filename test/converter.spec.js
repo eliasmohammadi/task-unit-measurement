@@ -2,8 +2,37 @@ const {describe, it} = require('mocha')
 const expect = require('chai').expect
 const {CoefficientUnit, BasicUnit, FormulatedUnit, Dimension} = require('../src/model/measurement.model')
 const unitConverter = require('../src/unit.converter')
-describe.only('Unit Converter', () => {
+describe('Unit Converter', () => {
 
+    it('should return false when two unit can not convert to each other',(done)=>{
+        const dimensionOne = new Dimension('length')
+        const dimensionTwo = new Dimension('electric')
+
+        const lengthBasicUnit = new BasicUnit('Meter','m',dimensionOne)
+        const electricBasicUnit = new BasicUnit('Ampere','A',dimensionTwo)
+
+        const lengthCoUnit = new CoefficientUnit('Millimeter','mm',lengthBasicUnit,0.001)
+        const electricCoUnit = new CoefficientUnit('MilliAmpere','mA',electricBasicUnit,0.001)
+        const isValid = unitConverter.isValidToConvert(lengthCoUnit,electricCoUnit)
+        expect(isValid).to.be.false
+        done()
+    })
+
+    it('should return NotSameBasicUnitException',(done)=>{
+        const dimensionOne = new Dimension('length')
+        const dimensionTwo = new Dimension('electric')
+
+        const lengthBasicUnit = new BasicUnit('Meter','m',dimensionOne)
+        const electricBasicUnit = new BasicUnit('Ampere','A',dimensionTwo)
+
+        const lengthCoUnit = new CoefficientUnit('Millimeter','mm',lengthBasicUnit,0.001)
+        const electricCoUnit = new CoefficientUnit('MilliAmpere','mA',electricBasicUnit,0.001)
+
+        const convert = unitConverter.convert(lengthCoUnit,electricCoUnit)
+
+        expect(convert.type).to.be.equal('NotSameBasicUnitException')
+        done()
+    })
 
     it('should convert CoefficientUnit to another CoefficientUnit', (done) => {
         const dimension = new Dimension('length')
@@ -56,5 +85,7 @@ describe.only('Unit Converter', () => {
 
         done()
     })
+
+
 
 })
