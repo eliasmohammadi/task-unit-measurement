@@ -4,12 +4,13 @@ class Dimension {
     }
 }
 
+
 class AbstractMeasurementUnit {
 
-    constructor(name, symbol, dimension) {
+    constructor(name, symbol, basicUnit) {
         this.name = name
         this.symbol = symbol
-        this.dimension = dimension
+        this.basicUnit = basicUnit
     }
 
     convertToBase(value, basicUnit) {
@@ -26,9 +27,11 @@ class AbstractMeasurementUnit {
 
 }
 
-class BasicUnit extends AbstractMeasurementUnit {
+class BasicUnit {
     constructor(name, symbol, dimension) {
-        super(name, symbol, dimension);
+        this.name = name
+        this.symbol = symbol
+        this.dimension = dimension
     }
 
     setValue(value) {
@@ -37,56 +40,50 @@ class BasicUnit extends AbstractMeasurementUnit {
 }
 
 class CoefficientUnit extends AbstractMeasurementUnit {
-    constructor(name, symbol, dimension, factor) {
-        super(name, symbol, dimension);
+    constructor(name, symbol, basicUnit, factor) {
+        super(name, symbol, basicUnit);
         this.factor = factor
+        this.basicUnit = basicUnit
+        this.value = undefined
     }
 
-    setValue(value) {
-        this.value = value
+
+    convertToBase(value) {
+        const bu = this.basicUnit
+        bu.setValue(this.factor * value)
+        return bu
     }
 
-    convertToBase(value, basicUnit) {
-        basicUnit.setValue(this.factor * value)
-        return basicUnit
-    }
-
-    convertFromBase(basicUnit) {
-        const nc = new CoefficientUnit(this.name, this.symbol, this.dimension, this.factor)
-        nc.setValue(basicUnit.value / this.factor)
-        return nc
+    convertFromBase() {
+        this.value = (this.basicUnit.value / this.factor)
     }
 }
 
 class FormulatedUnit extends AbstractMeasurementUnit {
-    constructor(name, symbol, dimension) {
-        super(name, symbol, dimension);
+    constructor(name, symbol, basicUnit) {
+        super(name, symbol, basicUnit);
+        this.value = undefined
     }
 
     setFormulaToBase(formula) {
         this.formulatedToBase = formula
     }
-    setFormulaFromBase(formula){
+
+    setFormulaFromBase(formula) {
         this.formulatedFromBase = formula
     }
 
-    setValue(value){
-        this.value = value
-    }
 
-
-    convertToBase(value, basicUnit) {
+    convertToBase(value) {
         const formula = this.formulatedToBase.replace(/a/gi, value)
-        basicUnit.setValue(eval(formula))
-        return basicUnit
+        const bu = this.basicUnit
+        bu.setValue(eval(formula))
+        return bu
     }
 
-    convertFromBase(basicUnit) {
-        const nf = new FormulatedUnit(this.name,this.symbol,this.dimension)
-        nf.setFormulaFromBase(this.formulatedFromBase)
-        const f = this.formulatedFromBase.replace(/a/gi,basicUnit.value)
-        nf.setValue(eval(f))
-        return nf
+    convertFromBase() {
+        const f = this.formulatedFromBase.replace(/a/gi, this.basicUnit.value)
+        this.value = (eval(f))
     }
 
 
