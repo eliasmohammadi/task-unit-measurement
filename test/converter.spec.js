@@ -37,17 +37,16 @@ describe('Unit Converter', () => {
     it('should convert CoefficientUnit to another CoefficientUnit', (done) => {
         const dimension = new Dimension('length')
         const basicUnit = new BasicUnit('Meter', 'm', dimension)
-        const firstCoUnit = new CoefficientUnit('Centimeter', 'cm', basicUnit, 0.01)
+        const firstCoUnit = new CoefficientUnit('Centimeter', 'cm', basicUnit, 0.01,2.2)
         const secondCoUnit = new CoefficientUnit('Millimeter', 'mm', basicUnit, 0.001)
 
-        firstCoUnit.setValue(2.2)
 
         const actualMilliMeter = unitConverter.convert(firstCoUnit, secondCoUnit)
         expect(actualMilliMeter.name).to.be.equal('Millimeter')
         expect(actualMilliMeter.symbol).to.be.equal('mm')
         expect(actualMilliMeter.value).to.be.equal(22)
 
-        secondCoUnit.setValue(34)
+        secondCoUnit.value = 34
 
         const actualCentiMeter = unitConverter.convert(secondCoUnit, firstCoUnit)
         expect(actualCentiMeter.name).to.be.equal('Centimeter')
@@ -59,7 +58,7 @@ describe('Unit Converter', () => {
     it('should convert FormulatedUnit to another FormulatedUnit', (done) => {
         const dimension = new Dimension('temperature')
         const basicUnit = new BasicUnit('Celsius', 'c', dimension)
-        const fahrenheitUnit = new FormulatedUnit('Fahrenheit', 'F', basicUnit)
+        const fahrenheitUnit = new FormulatedUnit('Fahrenheit', 'F', basicUnit,1)
         const kelvinUnit = new FormulatedUnit('Kelvin', 'K', basicUnit)
 
         fahrenheitUnit.setFormulaToBase('(a-32)*5/9')
@@ -69,14 +68,14 @@ describe('Unit Converter', () => {
         kelvinUnit.setFormulaToBase('a-273.15')
         kelvinUnit.setFormulaFromBase('a+273.15')
 
-        fahrenheitUnit.setValue(1)
+
 
         const actualKelvin = unitConverter.convert(fahrenheitUnit, kelvinUnit)
         expect(actualKelvin.name).to.be.equal('Kelvin')
         expect(actualKelvin.symbol).to.be.equal('K')
         expect(actualKelvin.value).to.be.equal(255.9)
 
-        kelvinUnit.setValue(1)
+        kelvinUnit.value = 1
         const actualFahrenheit = unitConverter.convert(kelvinUnit, fahrenheitUnit, {fixedDigit: 2})
         expect(actualFahrenheit.name).to.be.equal('Fahrenheit')
         expect(actualFahrenheit.symbol).to.be.equal('F')

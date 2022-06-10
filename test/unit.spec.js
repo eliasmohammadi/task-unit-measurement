@@ -18,8 +18,8 @@ describe('MeasurementUnit', () => {
     })
     it("should convert BasicUnit from CoefficientUnit", (done) => {
         const dimension = new Dimension('length')
-        const basicUnit = new BasicUnit('Meter', 'm', dimension)
-        basicUnit.setValue(1)
+        const basicUnit = new BasicUnit('Meter', 'm', dimension, 1)
+
         const coUnit = new CoefficientUnit('MilliMeter', 'mm', basicUnit, 0.001)
         coUnit.convertFromBase()
         expect(coUnit.value).to.be.equal(1000)
@@ -34,6 +34,15 @@ describe('MeasurementUnit', () => {
         expect(fu.isValidFormula('(a-2')).to.be.false
         expect(fu.isValidFormula('(a*b-2)')).to.be.false
         expect(fu.isValidFormula('(a*2)')).to.be.true
+        done()
+    })
+
+    it('should return InvalidFormulaFormatException for undefined formula', (done) => {
+
+        const dimension = new Dimension('temperature')
+        const basicUnit = new BasicUnit('Celsius', 'c', dimension)
+        const fu = new FormulatedUnit('kelvin', 'K', basicUnit)
+        expect(fu.convertFromBase().type).to.be.equal('InvalidFormulaFormatException')
         done()
     })
 
@@ -62,8 +71,7 @@ describe('MeasurementUnit', () => {
 
     it('should convert BasicUnit to FormulatedUnit', (done) => {
         const dimension = new Dimension('temperature')
-        const basicUnit = new BasicUnit('celsius', 'c', dimension)
-        basicUnit.setValue(1)
+        const basicUnit = new BasicUnit('celsius', 'c', dimension, 1)
         const formulatedUnit = new FormulatedUnit('fahrenheit', 'F', basicUnit)
         formulatedUnit.setFormulaFromBase('((a*9/5)+32)')
         formulatedUnit.convertFromBase()

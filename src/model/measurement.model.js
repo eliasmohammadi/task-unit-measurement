@@ -26,32 +26,27 @@ class AbstractMeasurementUnit {
 }
 
 class BasicUnit {
-    constructor(name, symbol, dimension) {
+    constructor(name, symbol, dimension, value = 1) {
         this.name = name
         this.symbol = symbol
         this.dimension = dimension
-    }
-
-    setValue(value) {
         this.value = value
     }
 }
 
 class CoefficientUnit extends AbstractMeasurementUnit {
-    constructor(name, symbol, basicUnit, factor) {
+    constructor(name, symbol, basicUnit, factor, value) {
         super(name, symbol, basicUnit);
         this.factor = factor
         this.basicUnit = basicUnit
-        this.value = undefined
-    }
-
-    setValue(value) {
-        this.value = value
+        this.value = value || 1
+        this.formulatedToBase = undefined
+        this.formulatedFromBase = undefined
     }
 
     convertToBase(value) {
         const bu = this.basicUnit
-        bu.setValue(this.factor * value)
+        bu.value = this.factor * value
         return bu
     }
 
@@ -63,9 +58,9 @@ class CoefficientUnit extends AbstractMeasurementUnit {
 }
 
 class FormulatedUnit extends AbstractMeasurementUnit {
-    constructor(name, symbol, basicUnit) {
+    constructor(name, symbol, basicUnit, value) {
         super(name, symbol, basicUnit);
-        this.value = undefined
+        this.value = value || 1
     }
 
     setFormulaToBase(formula) {
@@ -82,11 +77,6 @@ class FormulatedUnit extends AbstractMeasurementUnit {
         this.formulatedFromBase = formula
     }
 
-
-    setValue(value) {
-        this.value = value
-    }
-
     isValidFormula(formula) {
         try {
             const f = this._replaceValue(formula, 1)
@@ -98,13 +88,18 @@ class FormulatedUnit extends AbstractMeasurementUnit {
     }
 
     convertToBase(value) {
+        if (!this.formulatedToBase)
+            return InvalidFormulaFormatException
         const formula = this._replaceValue(this.formulatedToBase, value)
         const bu = this.basicUnit
-        bu.setValue(eval(formula))
+        bu.value = eval(formula)
         return bu
     }
 
     convertFromBase(options) {
+        if (!this.formulatedFromBase)
+            return InvalidFormulaFormatException
+
         const f = this._replaceValue(this.formulatedFromBase, this.basicUnit.value)
         this.value = (eval(f))
         if (options && options.fixedDigit)
