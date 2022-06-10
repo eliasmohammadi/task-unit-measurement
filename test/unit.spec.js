@@ -52,7 +52,7 @@ describe('MeasurementUnit', () => {
         const basicUnit = new BasicUnit('celsius', 'c', dimension)
         const formulatedUnit = new FormulatedUnit('fahrenheit', 'F', basicUnit)
         formulatedUnit.setFormulaToBase('((a-32) * 5)/9')
-        const actualBasicUnit = formulatedUnit.convertToBase(41, basicUnit)
+        const actualBasicUnit = formulatedUnit.convertToBase(41)
         expect(actualBasicUnit.name).to.be.equal('celsius')
         expect(actualBasicUnit.value).to.be.equal(5)
         expect(actualBasicUnit.symbol).to.be.equal('c')
