@@ -12,11 +12,11 @@ class AbstractMeasurementUnit {
         this.dimension = dimension
     }
 
-    convertToBase() {
+    convertToBase(value, basicUnit) {
         return new Error('not implemented')
     }
 
-    convertFromBase() {
+    convertFromBase(basicUnit) {
         return new Error('not implemented')
     }
 
@@ -52,7 +52,7 @@ class CoefficientUnit extends AbstractMeasurementUnit {
     }
 
     convertFromBase(basicUnit) {
-        const nc =  new CoefficientUnit(this.name,this.symbol,this.dimension,this.factor)
+        const nc = new CoefficientUnit(this.name, this.symbol, this.dimension, this.factor)
         nc.setValue(basicUnit.value / this.factor)
         return nc
     }
@@ -63,9 +63,33 @@ class FormulatedUnit extends AbstractMeasurementUnit {
         super(name, symbol, dimension);
     }
 
-    setFormula(formula) {
-        this.formula = formula
+    setFormulaToBase(formula) {
+        this.formulatedToBase = formula
     }
+    setFormulaFromBase(formula){
+        this.formulatedFromBase = formula
+    }
+
+    setValue(value){
+        this.value = value
+    }
+
+
+    convertToBase(value, basicUnit) {
+        const formula = this.formulatedToBase.replace(/a/gi, value)
+        basicUnit.setValue(eval(formula))
+        return basicUnit
+    }
+
+    convertFromBase(basicUnit) {
+        const nf = new FormulatedUnit(this.name,this.symbol,this.dimension)
+        nf.setFormulaFromBase(this.formulatedFromBase)
+        const f = this.formulatedFromBase.replace(/a/gi,basicUnit.value)
+        nf.setValue(eval(f))
+        return nf
+    }
+
+
 }
 
 
