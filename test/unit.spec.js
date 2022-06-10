@@ -2,7 +2,7 @@ const {describe, it} = require('mocha')
 const expect = require('chai').expect
 
 const {CoefficientUnit, BasicUnit, FormulatedUnit, Dimension} = require('../src/model/measurement.model')
-describe.only('MeasurementUnit', () => {
+describe('MeasurementUnit', () => {
 
 
     it('should convert CoefficientUnit to BasicUnit', (done) => {

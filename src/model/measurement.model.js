@@ -13,15 +13,11 @@ class AbstractMeasurementUnit {
         this.basicUnit = basicUnit
     }
 
-    convertToBase(value, basicUnit) {
+    convertToBase(basicUnit) {
         return new Error('not implemented')
     }
 
-    convertFromBase(basicUnit) {
-        return new Error('not implemented')
-    }
-
-    convertTo(measurementUnit) {
+    convertFromBase(options={}) {
         return new Error('not implemented')
     }
 
@@ -47,6 +43,9 @@ class CoefficientUnit extends AbstractMeasurementUnit {
         this.value = undefined
     }
 
+    setValue(value) {
+        this.value = value
+    }
 
     convertToBase(value) {
         const bu = this.basicUnit
@@ -54,8 +53,10 @@ class CoefficientUnit extends AbstractMeasurementUnit {
         return bu
     }
 
-    convertFromBase() {
+    convertFromBase(options={}) {
         this.value = (this.basicUnit.value / this.factor)
+        if(options && options.fixedDigit)
+            this.value  = parseFloat(this.value.toFixed(options.fixedDigit))
     }
 }
 
@@ -74,6 +75,10 @@ class FormulatedUnit extends AbstractMeasurementUnit {
     }
 
 
+    setValue(value) {
+        this.value = value
+    }
+
     convertToBase(value) {
         const formula = this.formulatedToBase.replace(/a/gi, value)
         const bu = this.basicUnit
@@ -81,9 +86,11 @@ class FormulatedUnit extends AbstractMeasurementUnit {
         return bu
     }
 
-    convertFromBase() {
+    convertFromBase(options) {
         const f = this.formulatedFromBase.replace(/a/gi, this.basicUnit.value)
         this.value = (eval(f))
+        if(options && options.fixedDigit)
+            this.value = parseFloat(this.value.toFixed(options.fixedDigit))
     }
 
 
